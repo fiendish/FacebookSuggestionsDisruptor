@@ -20,18 +20,117 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
- 
- 
+
+// Is one more effective than another? No idea.
+var REASONS_FOR_REMOVAL = {
+   "I don't care about this":1, 
+   "I keep seeing this":2, 
+   "It's offensive or inappropriate":3, 
+   "Other":4, 
+   "I want to see something else":5
+}
+
+function current_style(element) {
+   return element.currentStyle ? element.currentStyle : getComputedStyle(element, null);
+}
+
+Element.prototype.is_visible = function() {
+   var node = this;
+   while(node.tagName != 'BODY') {
+      var node_style = current_style(node);
+      if(node_style.display == "none" || node_style.visibility == "hidden") {
+         return false;
+      }
+      node = node.parentNode;
+   }
+   return true;
+}
+
+function find_visible(elements) {
+   var visible_elements = []
+   elements.forEach(
+      function(el) { if (el.is_visible()) { visible_elements.push(el); } }
+   );
+   return visible_elements;
+}
+
+function find_all_visible_from_selector(selector) {
+   var all_found = document.querySelectorAll(selector);
+   all_found = Array.prototype.slice.call(all_found,0);
+   return find_visible(all_found);
+}
+
+function all_trending() {
+   return find_all_visible_from_selector('[aria-label="Hide Trending Item"]');
+}
+function all_suggestions() {
+   return find_all_visible_from_selector('[title="Remove"], [data-tooltip-content="Remove Suggestion"]');
+}
+
 /*
-* Marks all items as "This is offensive" as the option seemingly most 
-* likely to forever eliminate categories of news from showing up.
+* Marks all trending news items as offensive, as the option seemingly most 
+* likely(???) to eliminate future categories of news from showing up.
 */
 function disrupt_trending_news() {
-   var element_nodes = document.querySelectorAll('[aria-label="Hide Trending Item"]'); 
-   elements = Array.prototype.slice.call(element_nodes,0);
-   elements.forEach(function(element) { element.click(); });
+   var REASON = REASONS_FOR_REMOVAL["It's offensive or inappropriate"];
+   
+   function remove_trending_news() {
+      var to_remove = all_trending();
 
-   var rdio_nodes = document.querySelectorAll('[name="trending_hide_reason"]'); 
-   rdios = Array.prototype.slice.call(rdio_nodes,0);
-   rdios.forEach(function(rdio) { if (rdio.value == 3) { rdio.click(); } });
+      if (to_remove.length > 0) {
+         to_remove.forEach(
+            function(element) { element.click(); }
+         );
+
+         var rdio_nodes = document.querySelectorAll('[name="trending_hide_reason"]'); 
+         rdios = Array.prototype.slice.call(rdio_nodes,0);
+         rdios.forEach(
+            function(rdio) { if (rdio.value == REASON) { rdio.click(); } }
+         );
+         
+         setTimeout(remove_trending_news, 100); // TODO: improve this?
+         console.log("trend");
+      }
+   }
+
+   // Extra trending news may be hidden, so first we click to unhide it
+   // and wait for the result.
+   var original_num_trending = all_trending().length;
+   function trending_expanded_check() {
+      if (all_trending().length == original_num_trending) {
+         setTimeout(trending_expanded_check, 100);
+         console.log("expand");
+      }
+      else {
+         remove_trending_news();
+      }
+   }
+   
+   var seemore = document.querySelector('[data-position="seemore"]');
+   if (seemore && seemore.is_visible()) {
+      seemore.click();
+      trending_expanded_check();
+   } else {
+      remove_trending_news();
+   }
 }
+
+
+/*
+* Removes page and people suggestions
+*/
+function disrupt_suggestions() {
+   var suggestion_removers = all_suggestions();
+   if (suggestion_removers.length > 0) {
+      suggestion_removers.forEach(
+         function(element) { element.click(); }
+      );
+      setTimeout(disrupt_suggestions, 100);
+      console.log("sug");
+   }
+}
+
+/******************* main **********************/
+
+disrupt_trending_news();
+disrupt_suggestions();
