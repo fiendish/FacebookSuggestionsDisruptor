@@ -89,7 +89,6 @@ function disrupt_trending_news() {
          );
          
          setTimeout(remove_trending_news, 100); // TODO: improve this?
-         console.log("trend");
       }
    }
 
@@ -99,7 +98,6 @@ function disrupt_trending_news() {
    function trending_expanded_check() {
       if (all_trending().length == original_num_trending) {
          setTimeout(trending_expanded_check, 100);
-         console.log("expand");
       }
       else {
          remove_trending_news();
@@ -126,7 +124,6 @@ function disrupt_suggestions() {
          function(element) { element.click(); }
       );
       setTimeout(disrupt_suggestions, 100);
-      console.log("sug");
    }
 }
 
