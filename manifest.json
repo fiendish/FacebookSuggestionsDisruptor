@@ -1,0 +1,27 @@
+{
+
+   "manifest_version": 2,
+   "name": "Facebook Suggestions Disruptor",
+   "version": "0.9",
+   
+   "description": "Automatically indicates offense or dislike for 'trending news' and 'suggestions' to mess with Facebook for their intrusive behavior.",
+   
+   "background": 
+   {
+      "scripts": ["fb_suggestions_disruptor_bg.js"]
+   },
+
+  "permissions": 
+   [
+      "*://*.facebook.com/", "tabs", "webNavigation"
+   ],
+   
+   "commands": 
+   {
+      "fb-suggestions-disrupt":
+      {
+         "suggested_key": { "default": "Ctrl+Shift+D" },
+         "description": "Manually activate Facebook suggestions disruption."
+      }
+   }
+}

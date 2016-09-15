@@ -77,6 +77,7 @@ function disrupt_trending_news() {
    function remove_trending_news() {
       var to_remove = all_trending();
 
+      var removed = 0;
       if (to_remove.length > 0) {
          to_remove.forEach(
             function(element) { element.click(); }
@@ -85,9 +86,10 @@ function disrupt_trending_news() {
          var rdio_nodes = document.querySelectorAll('[name="trending_hide_reason"]'); 
          rdios = Array.prototype.slice.call(rdio_nodes,0);
          rdios.forEach(
-            function(rdio) { if (rdio.value == REASON) { rdio.click(); } }
+            function(rdio) { if (rdio.value == REASON) { removed++; rdio.click(); } }
          );
          
+         console.log("Removed "+removed+" trending news items.");
          setTimeout(remove_trending_news, 100); // TODO: improve this?
       }
    }
@@ -123,6 +125,7 @@ function disrupt_suggestions() {
       suggestion_removers.forEach(
          function(element) { element.click(); }
       );
+      console.log("Removed "+suggestion_removers.length+" suggestions.");
       setTimeout(disrupt_suggestions, 100);
    }
 }
